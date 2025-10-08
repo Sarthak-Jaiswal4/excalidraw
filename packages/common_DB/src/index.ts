@@ -1,0 +1,1 @@
+export const JWT_secret="12243"
