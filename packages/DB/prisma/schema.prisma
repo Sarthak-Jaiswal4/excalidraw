@@ -13,9 +13,9 @@ model User {
   password    String
   name        String
   photo       String?
+  chats       Chat[]
   rooms       Room[]  @relation("AdminRooms")
   memberRooms Room[]  @relation("MemberRooms")
-  chats       Chat[]
 }
 
 model Room {
@@ -25,9 +25,9 @@ model Room {
   adminId   String
   photo     String?
   favorite  String[]
+  chats     Chat[]
   admin     User     @relation("AdminRooms", fields: [adminId], references: [id])
   members   User[]   @relation("MemberRooms")
-  chats     Chat[]
 }
 
 model Chat {

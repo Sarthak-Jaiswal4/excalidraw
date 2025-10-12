@@ -46,7 +46,6 @@ function Canvas({ roomId, socket }: { roomId: string, socket: WebSocket }) {
 
     useEffect(() => {
         const handleResize = () => {
-            console.log(`Updated Width: ${window.innerWidth}, Updated Height: ${window.innerHeight}`);
             const width = window.innerWidth
             const height = window.innerHeight
             setshape({ width, height })
