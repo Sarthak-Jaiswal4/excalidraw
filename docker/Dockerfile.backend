@@ -30,7 +30,7 @@ COPY --from=build /app/packages ./packages
 COPY --from=build /app/apps/http-backend/package.json ./apps/http-backend/
 COPY --from=build /app/apps/http-backend/dist ./apps/http-backend/dist
 
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 EXPOSE 3001
 
 CMD ["node","apps/http-backend/dist/index.js"]

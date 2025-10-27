@@ -30,7 +30,7 @@ COPY --from=build /app/packages ./packages
 COPY --from=build /app/apps/ws-backend/package.json ./apps/ws-backend/
 COPY --from=build /app/apps/ws-backend/dist ./apps/ws-backend/dist
 
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 EXPOSE 8080
 
 CMD ["tsx","apps/ws-backend/dist/index.js"]
