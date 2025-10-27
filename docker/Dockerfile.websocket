@@ -24,12 +24,13 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 COPY --from=build /app/package.json ./
+COPY --from=build /app/pnpm-lock.yaml ./
 COPY --from=build /app/pnpm-workspace.yaml ./
 COPY --from=build /app/packages ./packages
+COPY --from=build /app/apps/ws-backend/package.json ./apps/ws-backend/
 COPY --from=build /app/apps/ws-backend/dist ./apps/ws-backend/dist
-COPY --from=build /app/node_modules ./node_modules
 
-RUN pnpm install
+RUN pnpm install --prod --frozen-lockfile
 EXPOSE 8080
 
 CMD ["node","apps/ws-backend/dist/index.js"]
