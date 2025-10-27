@@ -27,3 +27,5 @@ jobs:
           tags: |
             sarthakjazz/excalidraw-websocket:${{ github.sha }}
             sarthakjazz/excalidraw-websocket:latest
+          build-args: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}

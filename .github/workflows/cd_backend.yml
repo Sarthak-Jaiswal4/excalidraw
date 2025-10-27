@@ -28,3 +28,5 @@ jobs:
           tags: |
             sarthakjazz/excalidraw-backend:${{ github.sha }}
             sarthakjazz/excalidraw-backend:latest
+          build-args: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}

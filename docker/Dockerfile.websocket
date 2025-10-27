@@ -1,5 +1,8 @@
 FROM node:20-alpine AS build
 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 RUN npm install -g pnpm
 WORKDIR /app
 
@@ -20,7 +23,7 @@ RUN pnpm run build --filter ws-backend
 
 FROM node:20-alpine AS run
 
-RUN npm install -g pnpm tsx
+RUN npm install -g pnpm
 WORKDIR /app
 
 COPY --from=build /app/package.json ./
@@ -33,4 +36,4 @@ COPY --from=build /app/apps/ws-backend/dist ./apps/ws-backend/dist
 RUN pnpm install --frozen-lockfile
 EXPOSE 8080
 
-CMD ["tsx","apps/ws-backend/dist/index.js"]
+CMD ["node","apps/ws-backend/dist/index.js"]
