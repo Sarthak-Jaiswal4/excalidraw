@@ -20,7 +20,7 @@ RUN pnpm run build --filter ws-backend
 
 FROM node:20-alpine AS run
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm tsx
 WORKDIR /app
 
 COPY --from=build /app/package.json ./
@@ -33,4 +33,4 @@ COPY --from=build /app/apps/ws-backend/dist ./apps/ws-backend/dist
 RUN pnpm install --prod --frozen-lockfile
 EXPOSE 8080
 
-CMD ["node","apps/ws-backend/dist/index.js"]
+CMD ["tsx","apps/ws-backend/dist/index.js"]
