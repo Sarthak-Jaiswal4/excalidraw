@@ -137,13 +137,13 @@ wss.on('connection',async function connection(ws, request) {
       const room = parsedData.room
       const message = parsedData.message
       
-      // const chat=await prismaClient.chat.create({
-      //   data:{
-      //     roomId:room,
-      //     message:message,
-      //     userId: userId as string
-      //   }
-      // })
+      const chat=await prismaClient.chat.create({
+        data:{
+          roomId:room,
+          message:message,
+          userId: userId as string
+        }
+      })
 
       try {
         await pub.publish(`${parsedData.room}`,JSON.stringify({

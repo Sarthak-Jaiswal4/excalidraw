@@ -1,0 +1,30 @@
+name: Push backend image to docker_hub
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+  name: push docker image to docker hub
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout the code
+      uses: actions/checkout@v4
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+    - name: Push image to hub 
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./docker/Dockerfile.backend
+        push: true
+        tags: |
+          sarthakjazz/excalidraw-backend:${{ github.sha }}
+          sarthakjazz/excalidraw-backend:latest
