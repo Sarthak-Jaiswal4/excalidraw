@@ -1,1 +1,32 @@
- 
+FROM node:20-alpine AS build
+
+RUN npm install -g pnpm
+WORKDIR /app
+
+COPY pnpm-lock.yaml pnpm-lock.yaml 
+COPY pnpm-workspace.yaml pnpm-workspace.yaml 
+COPY turbo.json turbo.json
+COPY package.json package.json
+
+COPY packages packages
+
+COPY ./apps/excalidraw ./apps/excalidraw
+
+RUN pnpm install --frozen-lockfile
+
+RUN pnpm run db:generate
+
+RUN pnpm run build --filter excalidraw
+
+FROM node:20-alpine AS run
+
+RUN npm install -g pnpm
+WORKDIR /app
+
+COPY --from=build /app/apps/excalidraw/.next/standalone ./
+COPY --from=build /app/apps/excalidraw/.next/static ./apps/excalidraw/.next/static
+COPY --from=build /app/apps/excalidraw/public ./apps/excalidraw/public
+
+EXPOSE 3000
+
+CMD ["node","apps/excalidraw/server.js"]
