@@ -57,49 +57,96 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Create Room
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle>Create a new Room</DialogTitle>
-              <DialogDescription>
-                Enter a name for your new room. You can edit this later.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col gap-4 py-2">
-              <div>
-                <label htmlFor="room-name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Room Name
-                </label>
-                <Input
-                  id="room-name"
-                  placeholder="Enter room name"
-                  value={roomName}
-                  onChange={(e) => setRoomName(e.target.value)}
-                  disabled={loading}
-                  className="mt-1"
-                />
-              </div>
-              {error && (
-                <div className="text-sm text-red-500">{error}</div>
-              )}
-            </div>
-            <DialogFooter>
-              <Button
-                onClick={handleCreateRoom}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? "Creating..." : "Create Room"}
+        <div className='flex gap-2 items-center'>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Join Room
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[400px]">
+              <DialogHeader>
+                <DialogTitle>Join an existing Room</DialogTitle>
+                <DialogDescription>
+                  Enter the name of the room you want to join.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-4 py-2">
+                <div>
+                  <label htmlFor="room-name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Room Name
+                  </label>
+                  <Input
+                    id="room-name"
+                    placeholder="Enter room name"
+                    value={roomName}
+                    onChange={(e) => setRoomName(e.target.value)}
+                    disabled={loading}
+                    className="mt-1"
+                  />
+                </div>
+                {error && (
+                  <div className="text-sm text-red-500">{error}</div>
+                )}
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={handleCreateRoom}
+                  disabled={loading}
+                  className="w-full"
+                >
+                  {loading ? "Joining..." : "Join Room"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <span className='text-xl'>/</span>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Create Room
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[400px]">
+              <DialogHeader>
+                <DialogTitle>Create a new Room</DialogTitle>
+                <DialogDescription>
+                  Enter a name for your new room. You can edit this later.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-4 py-2">
+                <div>
+                  <label htmlFor="room-name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Room Name
+                  </label>
+                  <Input
+                    id="room-name"
+                    placeholder="Enter room name"
+                    value={roomName}
+                    onChange={(e) => setRoomName(e.target.value)}
+                    disabled={loading}
+                    className="mt-1"
+                  />
+                </div>
+                {error && (
+                  <div className="text-sm text-red-500">{error}</div>
+                )}
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={handleCreateRoom}
+                  disabled={loading}
+                  className="w-full"
+                >
+                  {loading ? "Creating..." : "Create Room"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="cursor-pointer">

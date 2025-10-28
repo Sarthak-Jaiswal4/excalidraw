@@ -4,23 +4,23 @@ import { JWT_secret } from './config';
 import { prismaClient } from '@repo/DB/DB';
 import { createClient } from 'redis';
 
-const pub = createClient({
-    username: 'default',
-    password: 'mpZbNvRxYHTOKNUZ1iGPRBVF6Bpav0Qw',
-    socket: {
-        host: 'redis-16343.crce182.ap-south-1-1.ec2.redns.redis-cloud.com',
-        port: 16343
-    }
-});
+// const pub = createClient({
+//     username: 'default',
+//     password: 'mpZbNvRxYHTOKNUZ1iGPRBVF6Bpav0Qw',
+//     socket: {
+//         host: 'redis-16343.crce182.ap-south-1-1.ec2.redns.redis-cloud.com',
+//         port: 16343
+//     }
+// });
 
-const sub = createClient({
-  username: 'default',
-  password: 'mpZbNvRxYHTOKNUZ1iGPRBVF6Bpav0Qw',
-  socket: {
-      host: 'redis-16343.crce182.ap-south-1-1.ec2.redns.redis-cloud.com',
-      port: 16343
-  }
-});
+// const sub = createClient({
+//   username: 'default',
+//   password: 'mpZbNvRxYHTOKNUZ1iGPRBVF6Bpav0Qw',
+//   socket: {
+//       host: 'redis-16343.crce182.ap-south-1-1.ec2.redns.redis-cloud.com',
+//       port: 16343
+//   }
+// });
 
   const wss = new WebSocketServer({ port: 8080 });
 
@@ -48,12 +48,12 @@ function checkuser(token: string): string | null {
   }
 }
 
-pub.on('error', err => console.log('Redis Publisher Error', err));
-sub.on('error', err => console.log('Redis Subscriber Error', err));
+// pub.on('error', err => console.log('Redis Publisher Error', err));
+// sub.on('error', err => console.log('Redis Subscriber Error', err));
 
 // Connect to Redis
-pub.connect();
-sub.connect();
+// pub.connect();
+// sub.connect();
 
 wss.on('connection',async function connection(ws, request) {
   ws.on('error', console.error);
@@ -107,22 +107,22 @@ wss.on('connection',async function connection(ws, request) {
       } else {
         const upadteduser = existuser.rooms.push(parsedData.room)
       }
-      if(!subscribedchannel.has(parsedData.romm)){
-        subscribedchannel.add(parsedData.room)
-        try {
-          await sub.subscribe(`${parsedData.room}`, (message,channel) => {
-            console.log(`Subscribed successfully to room: ${channel},${message}`);
+      // if(!subscribedchannel.has(parsedData.romm)){
+      //   subscribedchannel.add(parsedData.room)
+      //   try {
+      //     await sub.subscribe(`${parsedData.room}`, (message,channel) => {
+      //       console.log(`Subscribed successfully to room: ${channel},${message}`);
             
-            users.forEach(user => {
-              if (user.rooms.includes(Number(channel)) && ws!==user.websocket) {
-                user.websocket.send(JSON.stringify(message))
-              }
-            })
-          });
-        } catch (err) {
-          console.error('Failed to subscribe:', err);
-        }
-      }
+      //       users.forEach(user => {
+      //         if (user.rooms.includes(Number(channel)) && ws!==user.websocket) {
+      //           user.websocket.send(JSON.stringify(message))
+      //         }
+      //       })
+      //     });
+      //   } catch (err) {
+      //     console.error('Failed to subscribe:', err);
+      //   }
+      // }
     }
 
     if (parsedData.type === "leave_room") {
@@ -145,16 +145,26 @@ wss.on('connection',async function connection(ws, request) {
         }
       })
 
-      try {
-        await pub.publish(`${parsedData.room}`,JSON.stringify({
-          type:"chat",
-          message,
-          roomId:Number(room),
-          userId
-        }));
-      } catch (err) {
-        console.error('Failed to publish message:', err);
-      }
+      users.forEach(user => {
+        if (user.rooms.includes(room)) {
+          user.websocket.send(JSON.stringify({
+            type:"chat",
+            message,
+            roomId:Number(room),
+          }))
+        }
+      })
+
+      // try {
+      //   await pub.publish(`${parsedData.room}`,JSON.stringify({
+      //     type:"chat",
+      //     message,
+      //     roomId:Number(room),
+      //     userId
+      //   }));
+      // } catch (err) {
+      //   console.error('Failed to publish message:', err);
+      // }
     }
 
     if(parsedData.type === 'delete'){

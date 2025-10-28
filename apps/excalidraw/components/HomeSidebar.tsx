@@ -23,19 +23,9 @@ const sidebarOptions = [
     href: "/team",
   },
   {
-    label: "Favorite",
-    icon: <Star className="w-5 h-5 mr-2" />,
-    href: "/favorite",
-  },
-  {
     label: "Trash",
     icon: <Trash2 className="w-5 h-5 mr-2" />,
     href: "/trash",
-  },
-  {
-    label: "Settings",
-    icon: <Settings className="w-5 h-5 mr-2" />,
-    href: "/settings",
   },
 ];
 

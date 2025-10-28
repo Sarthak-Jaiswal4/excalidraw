@@ -20,7 +20,7 @@ const CanvaHeader = ({ fileName = "Untitled Canvas" }: { fileName?: string }) =>
       <div className="flex items-center gap-3">
         <Button
           onClick={() => window.history.back()}
-          className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-full hover:bg-gray-600 transition-colors"
           aria-label="Back"
         >
           <ArrowLeft />

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Star, MoreVertical, Trash2, Folder, Plus } from "lucide-react";
 import { useRouter } from 'next/navigation';
-import { createRoom, getRooms } from '@/actions';
+import { createRoom, getRooms, updatefavorite } from '@/actions';
 import { Spinner } from '../ui/spinner';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty';
 import {
@@ -19,8 +19,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '../ui/input';
 
-function ProjectCard({ room, userId }: { room: any, userId: string }) {
-  const router = useRouter()
+function ProjectCard({ room, userId, favrooms }: { room: any, userId: string, favrooms: any[] | null }) {
+  const router = useRouter();
+  const isfav = favrooms?.some((rm) => rm.id === room.id) ?? false;
+
+  const update=async()=>{
+    const updatefav=await updatefavorite(userId,room.id,!isfav)
+    console.log(updatefav)
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden w-72 flex flex-col">
       {/* Drawing board image */}
@@ -39,15 +46,12 @@ function ProjectCard({ room, userId }: { room: any, userId: string }) {
           {`${room?.slug}`}
         </span>
         <div className='flex justify-center items-center gap-1'>
-          {room?.adminId === userId && (
-            <span className='bg-blue-400 px-2 py-1 text-[0.65rem] rounded-full text-white font-medium'>Admin</span>
-          )}
-          <Button variant="ghost" size="icon" className="p-2">
+          <Button variant="ghost" size="icon" className="p-2" onClick={()=> update()}>
             <Star
               className="w-4 h-4"
-              color={room?.favorite ? "#FFD700" : "#fff"}
-              fill={room?.favorite ? "#FFD700" : "#fff"}
-              style={{ stroke: room?.favorite ? "#FFD700" : "#ccc", strokeWidth: 2 }}
+              color={isfav ? "#FFD700" : "#fff"}
+              fill={isfav ? "#FFD700" : "#fff"}
+              style={{ stroke: isfav ? "#FFD700" : "#ccc", strokeWidth: 2 }}
             />
           </Button>
 
@@ -69,14 +73,21 @@ function ProjectCard({ room, userId }: { room: any, userId: string }) {
     </div>
   );
 }
-
+enum tabs {
+  all, my, joined, fav
+}
 export default function ProjectSection() {
   const [Rooms, setRooms] = useState<any[]>([])
-  const [userId, setuserId] = useState('')
+  const [userId, setuserId] = useState<string>("")
   const [loading, setloading] = useState(false)
-  const [error, seterror] = useState<string | null>()
+  const [error, seterror] = useState<string | null>(null)
   const [open, setOpen] = useState(false);
-  const [roomName, setRoomName] = useState("");
+  const [roomName, setRoomName] = useState<string>("");
+  const [fav, setfav] = useState<any[]>([])
+  const [memberRoom, setmemberRoom] = useState<any[]>([])
+  const [Tab, setTab] = useState<tabs>(tabs.all)
+  const [roomfilter, setroomfilter] = useState<any[]>([])
+  const [CreatedRoom, setCreatedRoom] = useState<any[]>([])
   const router = useRouter()
 
   useEffect(() => {
@@ -86,8 +97,12 @@ export default function ProjectSection() {
       try {
         const response = await getRooms()
         if (response.status) {
-          setRooms(response.rooms)
-          setuserId(response.userId)
+          setRooms(response?.myallrooms ?? [])
+          setuserId(response.userId || '')
+          setfav(response?.favrooms ?? [])
+          setmemberRoom(response?.memberroom ?? [])
+          setCreatedRoom(response?.mycreatedrooms ?? [])
+          setroomfilter(response?.myallrooms)
         } else if (response.status === false) {
           seterror("Fetching failed")
         }
@@ -98,8 +113,9 @@ export default function ProjectSection() {
       }
     }
     getroom()
-  }, [])
 
+  }, [])
+  // console.log(fav)
   const handleCreateRoom = async () => {
     if (!roomName.trim()) {
       seterror("Room name is required");
@@ -169,7 +185,7 @@ export default function ProjectSection() {
     )
   }
 
-  if (Rooms.length == 0) {
+  if (Rooms.length === 0) {
     return (
       <div className='w-full h-[60vh] flex justify-center items-center'>
         <div className='px-2 py-2 w-1/3 bg-gray-200/20 rounded-lg shadow-lg'>
@@ -238,10 +254,38 @@ export default function ProjectSection() {
   }
 
   return (
-    <div className="flex flex-wrap gap-6 py-8 px-4">
-      {Rooms.map((room, idx) => (
-        <ProjectCard room={room} userId={userId} key={idx} />
-      ))}
+    <div className="flex flex-wrap flex-col gap-2 py-8 px-4">
+      <div className="flex flex-row gap-2 text-sm">
+        <button
+          className={`px-4 py-1 rounded-2xl border hover:cursor-pointer ${Tab === tabs.all ? "bg-black text-white" : "bg-white text-gray-600"}`}
+          onClick={() => {setTab(tabs.all) ; setroomfilter(Rooms)}}
+        >
+          All
+        </button>
+        <button
+          className={`px-4 py-1 rounded-2xl border hover:cursor-pointer ${Tab === tabs.my ? "bg-black text-white" : "bg-white text-gray-600"}`}
+          onClick={() => {setTab(tabs.my); setroomfilter(CreatedRoom)} }
+        >
+          My Rooms
+        </button>
+        <button
+          className={`px-4 py-1 rounded-2xl border hover:cursor-pointer ${Tab === tabs.joined ? "bg-black text-white" : "bg-white text-gray-600"}`}
+          onClick={() => {setTab(tabs.joined) ; setroomfilter(memberRoom)}}
+        >
+          Joined Rooms
+        </button>
+        <button
+          className={`px-4 py-1 rounded-2xl border hover:cursor-pointer ${Tab === tabs.fav ? "bg-black text-white" : "bg-white text-gray-600"}`}
+          onClick={() => {setTab(tabs.fav) ; setroomfilter(fav)}}
+        >
+          Favorite Rooms
+        </button>
+      </div>
+      <div className='flex flex-wrap gap-6 py-4 px-4'>
+        {roomfilter.map((room, idx) => (
+          <ProjectCard room={room} userId={userId} key={idx} favrooms={fav} />
+        ))}
+      </div>
     </div>
   )
 }

@@ -33,7 +33,6 @@ app.post('/createroom', middleware, async (req: express.Request, res: express.Re
             data: {
                 slug: data.data?.name,
                 adminId: String(userId),
-                favorite: [],
                 members: {
                     connect: [{ id: String(userId) }]
                 },
@@ -95,10 +94,26 @@ app.get('/getallroom', middleware, async (req: Request, res: Response) => {
             where: { id: String(userId) },
             include: {
                 rooms: true,
-                memberRooms: true
+                memberRooms: true,
+                favorite:true,
             }
         })
-        res.json({ rooms, userId })
+
+        const allrooms = await prismaClient.room.findMany({
+            where: {
+                OR: [
+                    { adminId: String(userId) },
+                    {
+                        members: {
+                            some: {
+                                id: String(userId)
+                            }
+                        }
+                    }
+                ]
+            }
+        })
+        res.json({ rooms, userId, allrooms })
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: 'internal error' })
@@ -107,7 +122,7 @@ app.get('/getallroom', middleware, async (req: Request, res: Response) => {
 
 app.post('/update/members', middleware, async (req: Request, res: Response) => {
     try {
-        const {roomid} = req.body
+        const { roomid } = req.body
         console.log(roomid)
         const userid = req.userId
         if (!roomid) {
@@ -117,6 +132,22 @@ app.post('/update/members', middleware, async (req: Request, res: Response) => {
         if (!userid) {
             res.status(404).json({ message: 'unauthorized' })
             return
+        }
+
+        // Check if the user is already a member of the room
+        const isalready = await prismaClient.room.findFirst({
+            where: {
+                id: Number(roomid),
+                members: {
+                    some: {
+                        id: String(userid)
+                    }
+                }
+            }
+        });
+
+        if(isalready){
+            res.status(200).json({ message: "member already added" })
         }
 
         const updatemembers = await prismaClient.room.update({
@@ -137,17 +168,17 @@ app.post('/update/members', middleware, async (req: Request, res: Response) => {
     }
 })
 
-app.post('/update/snapshot',middleware,async(req:Request,res:Response)=>{
-    const {snapURL,roomid}=req.body
-    console.log(snapURL,roomid)
+app.post('/update/snapshot', middleware, async (req: Request, res: Response) => {
+    const { snapURL, roomid } = req.body
+    console.log(snapURL, roomid)
     try {
-        const updatesnap=await prismaClient.room.update({
-            where:{id:roomid},
-            data:{
-                photo:snapURL
+        const updatesnap = await prismaClient.room.update({
+            where: { id: roomid },
+            data: {
+                photo: snapURL
             }
         })
-        
+
         res.status(200).json({ message: "snapshot successfully updated" })
     } catch (error) {
         console.log(error)
@@ -155,6 +186,47 @@ app.post('/update/snapshot',middleware,async(req:Request,res:Response)=>{
     }
 })
 
-app.listen(3001,()=>{
+app.post("/update/favorite", middleware, async (req: Request, res: Response) => {
+    try {
+        const { userID, action, roomid } = req.body;
+        console.log(userID,action,roomid)
+        if (!userID || typeof action !== "boolean" || !roomid) {
+            res.status(400).json({ message: "missing required fields" });
+            return;
+        }
+
+        let updateData: any = {};
+        if (action) {
+            updateData = {
+                favorite: {
+                    connect: {
+                        id: Number(roomid)
+                    }
+                }
+            };
+        } else {
+            updateData = {
+                favorite: {
+                    disconnect: {
+                        id: Number(roomid)
+                    }
+                }
+            };
+        }
+
+        const updatedUser = await prismaClient.user.update({
+            where: { id: userID },
+            data: updateData,
+            include: { favorite:true }
+        });
+
+        res.status(200).json(updatedUser)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "something went wrong" });
+    }
+});
+
+app.listen(3001, () => {
     console.log("Running on port 3001")
 })
