@@ -155,6 +155,6 @@ app.post('/update/snapshot',middleware,async(req:Request,res:Response)=>{
     }
 })
 
-app.listen(3001,()=>{
+app.listen(3002,()=>{
     console.log("Running on port 3001")
 })

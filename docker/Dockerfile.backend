@@ -17,6 +17,7 @@ COPY ./apps/http-backend ./apps/http-backend
 
 RUN pnpm install
 
+RUN pnpm run db:migrate
 RUN pnpm run db:generate
 
 RUN pnpm run build --filter http-backend
