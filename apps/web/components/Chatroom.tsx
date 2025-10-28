@@ -8,7 +8,7 @@ async function Chatroom({
     roomId:string
 }) {
     const getmessage=async(roomId:string)=>{
-        const msg=await axios.get(`http://localhost:3001/chat/${roomId}`)
+        const msg=await axios.get(`http://backend:3001/chat/${roomId}`)
         return msg.data.message
     }
 

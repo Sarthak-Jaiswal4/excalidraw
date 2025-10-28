@@ -7,7 +7,7 @@ function SocketLayer({roomId}:{roomId:string}) {
     const [socket, setsocket] = useState<WebSocket|null>(null)
 
     useEffect(() => {
-        const ws=new WebSocket("ws://localhost:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMDFiNjNjYi1mZDMzLTRiZTMtYjU3ZS02MjM1Nzc2NWY4MWUiLCJpYXQiOjE3NTk5NDAxNTB9.bLVtGH90Q30jeqdBF_KK8Q0sdtBnsBO0YCcvWunHtKc")
+        const ws=new WebSocket("ws://websocket:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMDFiNjNjYi1mZDMzLTRiZTMtYjU3ZS02MjM1Nzc2NWY4MWUiLCJpYXQiOjE3NTk5NDAxNTB9.bLVtGH90Q30jeqdBF_KK8Q0sdtBnsBO0YCcvWunHtKc")
         ws.onopen=()=>{
           setsocket(ws)
           ws.send(JSON.stringify({

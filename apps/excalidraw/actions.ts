@@ -4,7 +4,7 @@ import axios from "axios";
 import { cookies } from "next/headers";
 
 export const login = async (data: any) => {
-    const response = await axios.post('http://localhost:3001/login', data);
+    const response = await axios.post('http://backend:3001/login', data);
     if (response.status === 200 && response.data.token) {
         (await cookies()).set("token", response.data.token);
         return { success: true };
@@ -14,7 +14,7 @@ export const login = async (data: any) => {
 }
 
 export const signup = async (data: any) => {
-    const response = await axios.post('http://localhost:3001/signup', data);
+    const response = await axios.post('http://backend:3001/signup', data);
     if (response.status === 200 && response.data.token) {
         (await cookies()).set("token", response.data.token);
         return { success: true };
@@ -25,7 +25,7 @@ export const signup = async (data: any) => {
 
 export const getRooms=async()=>{
     const getcookie = (await cookies()).get("token");
-    const getroom = await axios.get('http://localhost:3001/getallroom', {
+    const getroom = await axios.get('http://backend:3001/getallroom', {
         headers: {
             Authorization: `${getcookie?.value}`
         }
@@ -46,7 +46,7 @@ export const getRooms=async()=>{
 export const createRoom=async(name:string)=>{
     const getcookie=(await cookies()).get("token")
     const createroom = await axios.post(
-        'http://localhost:3001/createroom',
+        'http://backend:3001/createroom',
         {name}, // send as string
         {
             headers: {
@@ -64,7 +64,7 @@ export const createRoom=async(name:string)=>{
 export const updatemember=async(roomid:string)=>{
     const getcookie=(await cookies()).get("token")
     const updatemember = await axios.post(
-        'http://localhost:3001/update/members',
+        'http://backend:3001/update/members',
         {roomid}, 
         {
             headers: {
@@ -83,7 +83,7 @@ export const updatemember=async(roomid:string)=>{
 export async function GetMessages(roomid:string): Promise<any[]> {
     try {
         const getcookie=(await cookies()).get("token")
-        const response = await axios.get(`http://localhost:3001/chat/${roomid}`, {
+        const response = await axios.get(`http://backend:3001/chat/${roomid}`, {
             headers: {
                 Authorization: `${getcookie?.value}`
             }
@@ -102,7 +102,7 @@ export async function updatesnap(snapURL:string,roomid:number) {
     try {
         console.log(snapURL,roomid)
         const getcookie=(await cookies()).get("token")
-        const response = await axios.post(`http://localhost:3001/update/snapshot`,{snapURL,roomid},{
+        const response = await axios.post(`http://backend:3001/update/snapshot`,{snapURL,roomid},{
             headers: {
                 Authorization: `${getcookie?.value}`
             }
