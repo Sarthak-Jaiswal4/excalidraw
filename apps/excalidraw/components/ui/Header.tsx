@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from '../ui/input';
 import { useRouter } from 'next/navigation';
-import { createRoom } from '@/actions';
+import { createRoom, logout } from '@/actions';
 
 export default function Header() {
   const [loading, setloading] = useState(false)
@@ -165,7 +165,7 @@ export default function Header() {
               <User className="w-4 h-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-red-600">
+            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-red-600" onClick={()=>{logout(); router.push('/login')}}>
               <LogOut className="w-4 h-4" />
               Logout
             </DropdownMenuItem>

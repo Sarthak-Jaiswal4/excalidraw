@@ -23,6 +23,15 @@ export const login = async (data: any) => {
     }
 }
 
+export const logout = async () => {
+    try {
+        const token=(await cookies()).delete("token")
+        return { success: true };
+    } catch (error) {
+        return { success: false };
+    }
+}
+
 export const signup = async (data: any) => {
     const response = await instance.post('/signup', data);
     if (response.status === 200 && response.data.token) {

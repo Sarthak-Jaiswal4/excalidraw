@@ -12,6 +12,12 @@ app.use(cors())
 app.post('/signup', signup)
 app.post('/login', login)
 
+app.get('/logout',middleware,async (req:Request,res:Response)=>{
+    const userID=req.userId
+    console.log(userID)
+    
+})
+
 app.post('/createroom', middleware, async (req: express.Request, res: express.Response) => {
     console.log(req.body)
     const data = CreateRoomSchema.safeParse(req.body)
