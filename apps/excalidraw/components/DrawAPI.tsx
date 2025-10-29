@@ -25,7 +25,15 @@ type Draw = {
     id: number
     type: "pencil",
     points: { x: number, y: number }[]
-};
+} | {
+    id:number,
+    type:"text",
+    text:string
+    font_size: number
+    font_type: string
+    startx: number
+    starty: number
+}
 
 export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSocket, roomid: string) {
     const ctx = canvas?.getContext("2d")
@@ -67,6 +75,7 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
     let draw = false
     let panning = false
     let deleting=false
+    let texting =false
     let pencilPoints: { x: number, y: number }[] = [];
 	let dragStartMouseX = 0
 	let dragStartMouseY = 0
@@ -76,6 +85,9 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
 	let panOffsetY = 0 
 	let panStartMouseX = 0
 	let panStartMouseY = 0
+    let texts=""
+    let textID=0;
+    canvas.tabIndex = 0;
 
     canvas?.addEventListener("mousedown", function (e) {
         e.preventDefault()
@@ -83,9 +95,10 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
 		starty = (e.offsetY - panOffsetY)/scale
         console.log(startx,starty,e.offsetX,e.offsetY)
         getPosition(e);
+        texting=false;
         // @ts-ignore
         const tool = window.SelectedTool
-        if (tool != 'pan' && tool != 'delete') {
+        if (tool != 'pan' && tool != 'delete' && tool!='text') {
             draw = true
             if (tool === 'pencil') {
                 pencilPoints = [{ x: coord.x, y: coord.y }];
@@ -108,13 +121,21 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
 					if (selectedShape && selectedShape.type === 'rect') {
 						dragStartShapeX = selectedShape.startx
 						dragStartShapeY = selectedShape.starty
-					}
+					}else if(selectedShape && selectedShape.type=== 'circle'){
+                        dragStartShapeX = selectedShape.centerx
+						dragStartShapeY = selectedShape.centery
+                    } 
 				}
 				console.log(selectedShape)
             }
         } else if(tool==='delete'){
             deleting=true
-		} else {
+		} else if (tool==='text'){
+            texts=""
+            texting=true
+            textID++;
+            canvas.focus(); 
+        } else {
 			panning = true
 			panStartMouseX = e.offsetX
 			panStartMouseY = e.offsetY
@@ -254,7 +275,7 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
                     }
                     ctx.stroke();
                 }
-			} else if (tool == 'move' && selectedShape && selectedShape.type=='rect' && dragging) {
+			} else if (tool == 'move' && selectedShape && dragging) {
                 socket.send(JSON.stringify({
                     type:"corsor_move",
                     posx:e.offsetX,
@@ -263,8 +284,13 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
                 }))
 				const newX = dragStartShapeX + (((e.offsetX - panOffsetX)/scale) - dragStartMouseX)
 				const newY = dragStartShapeY + (((e.offsetY - panOffsetY)/scale) - dragStartMouseY)
-				selectedShape.startx = newX
-				selectedShape.starty = newY
+                if(selectedShape.type=='circle'){
+                    selectedShape.centerx = newX
+                    selectedShape.centery = newY
+                }else if (selectedShape.type=='rect'){
+                    selectedShape.startx = newX
+                    selectedShape.starty = newY
+                }
 				drawing = drawing.map((shape:Draw) => { if (shape.id === selectedShape?.id) return selectedShape; return shape })
 				clearRect(drawing, ctx, canvas)
 			} 
@@ -287,6 +313,31 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
 			ctx.setTransform(scale, 0, 0, scale, tx, ty)
 			clearRect(drawing, ctx, canvas)
         }
+    })
+
+    canvas.addEventListener('keydown',function(e){
+        // drawing = drawing.filter(e => e.id !== textID);
+        // @ts-ignore
+        const tool = window.SelectedTool
+
+        texts+=String(e.key)
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "white";
+        ctx.fillText(`${texts}`,startx,starty);
+        const text: Draw = {
+            id: textID,
+            type: "text",
+            text: texts,
+            font_size: 30,
+            font_type: "Arial",
+            startx: startx,
+            starty: starty
+        }
+        drawing.push(text)
+        clearRect(drawing, ctx, canvas)
+        socket.send(JSON.stringify({
+            message: JSON.stringify(text), room: Number(roomid), type: "chat"
+        }))
     })
 
     canvas.addEventListener('wheel', function (e) {
@@ -325,8 +376,29 @@ function hitShape(x:number, y:number, drawing:Draw[]): Draw | null {
 			if (nx * nx + ny * ny <= 1) {
 				return shape
 			}
+		} else if (shape.type === 'line') {
+			const { startx, starty, endx, endy } = shape;
+			const dx = endx - startx;
+			const dy = endy - starty;
+            const slope=dy/dx;
+            const lhs=starty-y;
+            const rhs=slope*(startx-x);
+            const tolerance=0.8
+            console.log("Line selected")
+            if(Math.abs(lhs - rhs) < tolerance){
+                return shape
+            }
+			// const lengthSq = dx * dx + dy * dy;
+			// let t = ((x - startx) * dx + (y - starty) * dy) / lengthSq;
+			// t = Math.max(0, Math.min(1, t)); // Clamp t to [0,1] to stay within segment
+			// const closestX = startx + t * dx;
+			// const closestY = starty + t * dy;
+			// const distSq = (x - closestX) ** 2 + (y - closestY) ** 2;
+			// const threshold = 8; // px tolerance for selecting a line
+			// if (distSq <= threshold * threshold) {
+			// 	return shape;
+			// }
 		}
-		// Optionally add hit-tests for 'line' and 'pencil' types later
 	}
 	return null
 }
@@ -361,6 +433,10 @@ function clearRect(drawing: Draw[], ctx: CanvasRenderingContext2D, canvas: HTMLC
                 }
                 ctx.stroke();
             }
+        } else if(shape.type==='text'){
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "white";
+            ctx.fillText(`${shape.text}`,shape.startx,shape.starty);
         }
     })
 }

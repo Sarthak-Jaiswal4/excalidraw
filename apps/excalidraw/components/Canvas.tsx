@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from "react"
 import DrawApi from "./DrawAPI"
-import { Square, Circle, LineChart, Pencil, Hand, Move, Trash2 } from "lucide-react";
+import { Square, Circle, LineChart, Pencil, Hand, Move, Trash2, Type } from "lucide-react";
 
 interface CursorProp {
     posx: number;
@@ -90,6 +90,13 @@ function Canvas({ roomId, socket }: { roomId: string, socket: WebSocket }) {
                         title="Pencil"
                     >
                         <Pencil className="w-5 h-5" />
+                    </button>
+                    <button
+                        className={`text-lg border border-gray-600 rounded-lg pointer ${Whichelem === 'text' ? "text-red-400" : "text-gray-400"} hover:bg-gray-700 hover:text-white px-2 py-1 flex items-center justify-center`}
+                        onClick={() => setWhichelem("text")}
+                        title="text"
+                    >
+                        <Type className="w-5 h-5" />
                     </button>
                     <button
                         className={`text-lg border border-gray-600 rounded-lg pointer ${Whichelem === 'pan' ? "text-red-400" : "text-gray-400"} hover:bg-gray-700 hover:text-white px-2 py-1 flex items-center justify-center`}
