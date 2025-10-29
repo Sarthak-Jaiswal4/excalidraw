@@ -227,6 +227,33 @@ app.post("/update/favorite", middleware, async (req: Request, res: Response) => 
     }
 });
 
+app.post("/delete/room", middleware, async (req: Request, res: Response) => {
+    try {
+        const { roomid } = req.body;
+        if (!roomid) {
+            return res.status(400).json({ message: "roomid is required" });
+        }
+
+        await prismaClient.chat.deleteMany({
+            where: {
+                roomId: Number(roomid)
+            }
+        });
+
+        const deletedRoom = await prismaClient.room.delete({
+            where: {
+                id: Number(roomid)
+            }
+        });
+
+        console.log(deletedRoom);
+        return res.status(200).json({ message: "success" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error deleting room" });
+    }
+});
+
 app.listen(3001, () => {
     console.log("Running on port 3001")
 })

@@ -58,7 +58,7 @@ export default function Header() {
 
       <div className="flex items-center gap-4">
         <div className='flex gap-2 items-center'>
-          <Dialog open={open} onOpenChange={setOpen}>
+          {/* <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Plus className="w-4 h-4" />
@@ -101,7 +101,7 @@ export default function Header() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          <span className='text-xl'>/</span>
+          <span className='text-xl'>/</span> */}
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">

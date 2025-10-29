@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Star, MoreVertical, Trash2, Folder, Plus } from "lucide-react";
 import { useRouter } from 'next/navigation';
-import { createRoom, getRooms, updatefavorite } from '@/actions';
+import { createRoom, DeleteRoom, getRooms, updatefavorite } from '@/actions';
 import { Spinner } from '../ui/spinner';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty';
 import {
@@ -22,6 +22,11 @@ import { Input } from '../ui/input';
 function ProjectCard({ room, userId, favrooms }: { room: any, userId: string, favrooms: any[] | null }) {
   const router = useRouter();
   const isfav = favrooms?.some((rm) => rm.id === room.id) ?? false;
+
+  const deleteRoom=async()=>{
+    const Delete=await DeleteRoom(room.id)
+    console.log(Delete)
+  }
 
   const update=async()=>{
     const updatefav=await updatefavorite(userId,room.id,!isfav)
@@ -62,7 +67,7 @@ function ProjectCard({ room, userId, favrooms }: { room: any, userId: string, fa
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem className="text-red-600 flex items-center gap-2 cursor-pointer">
+              <DropdownMenuItem className="text-red-600 flex items-center gap-2 cursor-pointer" onClick={()=>deleteRoom()}>
                 <Trash2 className="w-4 h-4" />
                 Delete
               </DropdownMenuItem>

@@ -5,10 +5,11 @@ import { updatemember } from '@/actions'
 
 function SocketLayer({roomId}:{roomId:string}) {
     const [socket, setsocket] = useState<WebSocket|null>(null)
-
+    const IP=  process.env.PROD_HOST
+    console.log(IP)
     useEffect(() => {
         try {
-          const ws=new WebSocket("ws://localhost:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMDFiNjNjYi1mZDMzLTRiZTMtYjU3ZS02MjM1Nzc2NWY4MWUiLCJpYXQiOjE3NTk5NDAxNTB9.bLVtGH90Q30jeqdBF_KK8Q0sdtBnsBO0YCcvWunHtKc")
+          const ws=IP ? new WebSocket("ws://localhost:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMDFiNjNjYi1mZDMzLTRiZTMtYjU3ZS02MjM1Nzc2NWY4MWUiLCJpYXQiOjE3NTk5NDAxNTB9.bLVtGH90Q30jeqdBF_KK8Q0sdtBnsBO0YCcvWunHtKc") : new WebSocket("ws://websocket:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJmMDFiNjNjYi1mZDMzLTRiZTMtYjU3ZS02MjM1Nzc2NWY4MWUiLCJpYXQiOjE3NTk5NDAxNTB9.bLVtGH90Q30jeqdBF_KK8Q0sdtBnsBO0YCcvWunHtKc")
           ws.onopen=()=>{
             setsocket(ws)
             ws.send(JSON.stringify({
