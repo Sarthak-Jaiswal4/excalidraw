@@ -6,6 +6,8 @@ import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
 import { SpinnerDemo } from './LoadingSpinner';
 import { login } from '@/actions';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { ChevronDown } from 'lucide-react';
 
 function LoginPage() {
   const router = useRouter();
@@ -42,7 +44,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 flex-col gap-4">
       <form
         className="flex flex-col gap-4 p-8 bg-white border border-gray-200 rounded-lg shadow-md min-w-[320px] w-full max-w-sm"
         onSubmit={handleSubmit}
@@ -83,7 +85,7 @@ function LoginPage() {
         </div>
         <Button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-2xl transition-colors"
           disabled={loading}
         >
           {loading ? 'Logging In...' : 'Log In'}
@@ -95,6 +97,29 @@ function LoginPage() {
           </a>
         </div>
       </form>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button className='bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-2xl transition-colors'>For Recruiter <ChevronDown className='w-4 h-4' /></Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="center" className='w-56'>
+          <DropdownMenuLabel>Login Details</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <div className='flex items-center justify-between gap-2 w-full'>
+              <h1>Email</h1>
+              <h4>sarthak@gmail.com</h4>
+            </div>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <div className='flex items-center justify-between gap-2 w-full'>
+              <h1>Password</h1>
+              <h4>12345</h4>
+            </div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       {loading && (
         <div className="fixed left-1/2 bottom-8 transform -translate-x-1/2 z-50 shadow-md rounded-full">
           <SpinnerDemo title='Signing In' />

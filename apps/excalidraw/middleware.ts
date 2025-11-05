@@ -4,6 +4,10 @@ import { NextResponse, NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const {pathname}=request.nextUrl
     const token=request.cookies.get('token')
+
+    if(pathname==='/'){
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
     if (!token) {
         console.log("unauthorized");
         return NextResponse.redirect(new URL('/login', request.url));
@@ -17,6 +21,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard',
-    '/canva/:path*'
+    '/canva/:path*',
+    '/'
   ],
 }
