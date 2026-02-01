@@ -1,135 +1,77 @@
-# Turborepo starter
+# <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Artist%20Palette.png" alt="Palette" width="45" height="45" /> DrawBorad
 
-This Turborepo starter is maintained by the Turborepo core team.
+> **High-Fidelity Collaboration:** A distributed, real-time collaborative whiteboard engine built for infinite scalability and low-latency creative workflows.
 
-## Using this example
+<div align="center">
+  <img src="https://capsule-render.vercel.app/render?type=soft&color=auto&height=250&section=header&text=SyncSketch&fontSize=90&animation=fadeIn&fontAlignY=38" width="100%" />
+</div>
 
-Run the following command:
+<p align="center">
+  <img src="https://img.shields.io/badge/Architecture-Monorepo-blueviolet?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Real--Time-WebSocket_Pub_Sub-success?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Engine-Custom_Canvas_API-orange?style=for-the-badge" />
+</p>
 
-```sh
-npx create-turbo@latest
-```
+<p align="center">
+  <a href="#-the-engine">The Engine</a> •
+  <a href="#-technical-architecture">Architecture</a> •
+  <a href="#-scalability-model">Scalability</a> •
+  <a href="#-tech-stack">Tech Stack</a> •
+  <a href="#-deployment">Deployment</a>
+</p>
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
+## 🎨 The Engine
+SyncSketch isn't just a wrapper; it features a **bare-metal Canvas implementation**. Every interaction is optimized for 60FPS performance.
 
-### Apps and Packages
+* **Custom Geometry:** Hand-written logic for rendering shapes, paths, and selection boxes.
+* **Infinite Workspace:** Advanced Panning and Zooming algorithms for an unconstrained creative field.
+* **Object Manipulation:** Real-time movement, resizing, and state reconciliation for multi-user editing.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+---
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+## 🏗️ Technical Architecture
 
-### Utilities
+The project is managed as a **Monorepo**, separating concerns while sharing types and logic across the stack.
 
-This Turborepo has some additional tools already setup for you:
+### 🧩 The Multi-Server Nexus
+1.  **HTTP API (Node.js):** Handles user authentication, room persistence, and canvas metadata.
+2.  **WebSocket Server (Node.js):** A high-concurrency state relay that manages live cursor positions and drawing updates.
+3.  **React Frontend:** A highly optimized UI that utilizes the HTML5 Canvas API with custom hit-detection logic.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+---
 
-### Build
+## 🛠️ Tech Stack
 
-To build all apps and packages, run the following command:
+| Layer | Technology | Usage |
+| :--- | :--- | :--- |
+| **Frontend** | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | Powering the high-performance drawing interface and collaborative UI. |
+| **Canvas Engine** | ![HTML5 Canvas](https://img.shields.io/badge/Canvas_API-E34F26?style=flat&logo=html5&logoColor=white) | Bare-metal implementation for custom shapes, panning, and hit-detection. |
+| **Backends** | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs&logoColor=white) ![Express](https://img.shields.io/badge/Express.js-000000?style=flat&logo=express&logoColor=white) | Distributed Monorepo architecture with dedicated HTTP and WebSocket services. |
+| **Real-Time Layer** | ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=flat&logo=socket.io&logoColor=white) ![Redis](https://img.shields.io/badge/Redis_PubSub-DC382D?style=flat&logo=redis&logoColor=white) | Event synchronization across multiple server instances via Pub/Sub. |
+| **Infrastructure** | ![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=flat&logo=amazonec2&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) | Containerized services deployed on cloud instances for high availability. |
+| **Pipeline** | ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=github-actions&logoColor=white) ![Docker Hub](https://img.shields.io/badge/Docker_Hub-2496ED?style=flat&logo=docker&logoColor=white) | Automated CI/CD for image builds, registry storage, and remote redeployment. |
 
-```
-cd my-turborepo
+## ⚙️ How It Works (The Flow)
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+```mermaid
+graph TD
+    %% Frontend
+    U1((👤 User A)) -->|Drawing| Canvas[Custom Canvas Engine]
+    Canvas -->|Emit Event| WS1[WS Server Node 1]
+    
+    subgraph "Distributed State Layer"
+        WS1 -->|Publish| Redis[(Redis Pub/Sub)]
+        Redis -->|Subscribe| WS2[WS Server Node 2]
+    end
+    
+    subgraph "Persistent Layer"
+        HTTP[HTTP API Server] -->|Save State| DB[(Database)]
+    end
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+    WS2 -->|Broadcast| U2((👤 User B))
+    
+    style Redis fill:#D82C20,color:#fff
+    style WS1 fill:#6E40C9,color:#fff
+    style WS2 fill:#6E40C9,color:#fff
