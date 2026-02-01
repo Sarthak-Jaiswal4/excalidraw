@@ -53,6 +53,26 @@ The project is managed as a **Monorepo**, separating concerns while sharing type
 | **Infrastructure** | ![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=flat&logo=amazonec2&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) | Containerized services deployed on cloud instances for high availability. |
 | **Pipeline** | ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=github-actions&logoColor=white) ![Docker Hub](https://img.shields.io/badge/Docker_Hub-2496ED?style=flat&logo=docker&logoColor=white) | Automated CI/CD for image builds, registry storage, and remote redeployment. |
 
+## ⚙️ System Flow
+
+### 1. Collaborative Real-time Architecture
+SyncSketch uses a **Distributed WebSocket** model. When multiple users are in the same room but connected to different server instances, **Redis Pub/Sub** acts as the central nervous system to ensure global state synchronization.
+
+```mermaid
+sequenceDiagram
+    participant UserA as 👤 User A
+    participant WS1 as 🚀 WS Server 1
+    participant Redis as 🛑 Redis Pub/Sub
+    participant WS2 as 🚀 WS Server 2
+    participant UserB as 👤 User B
+
+    UserA->>WS1: Draw Shape (Socket.emit)
+    WS1->>Redis: Publish Event (Room_ID)
+    Redis-->>WS1: Subscribed
+    Redis-->>WS2: Subscribed
+    WS2->>UserB: Broadcast Shape (Socket.broadcast)
+    Note over UserA, UserB: End-to-end latency < 50ms
+
 ## ⚙️ How It Works (The Flow)
 
 ```mermaid
