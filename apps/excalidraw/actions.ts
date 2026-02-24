@@ -6,13 +6,14 @@ import { cookies } from "next/headers";
 const url=  process.env.PROD_HOST
 
 const instance = axios.create({
-    baseURL: url ? "http://localhost:3001/" : "http://backend:3001/"
+    baseURL: url ? "http://backend:3001/" : "http://localhost:3001/"
 });
 console.log(instance.getUri())
 export const login = async (data: any) => {
     try {
         const response = await instance.post('/login', data);
         if (response.status === 200 && response.data.token) {
+            console.log(response.data.token);
             (await cookies()).set("token", response.data.token);
             return { success: true };
         } else {
@@ -98,7 +99,7 @@ export const updatemember = async (roomid: string) => {
     }
 }
 
-export async function GetMessages(roomid: string): Promise<any[]> {
+export async function GetMessages(roomid: string,ctx:CanvasRenderingContext2D,canvas:HTMLCanvasElement): Promise<any[]> {
     try {
         const getcookie = (await cookies()).get("token");
         const response = await instance.get(`/chat/${roomid}`, {

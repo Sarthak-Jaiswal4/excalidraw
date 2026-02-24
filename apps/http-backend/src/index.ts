@@ -170,7 +170,6 @@ app.post('/update/members', middleware, async (req: Request, res: Response) => {
 
 app.post('/update/snapshot', middleware, async (req: Request, res: Response) => {
     const { snapURL, roomid } = req.body
-    console.log(snapURL, roomid)
     try {
         const updatesnap = await prismaClient.room.update({
             where: { id: roomid },

@@ -61,11 +61,13 @@ export const login = async (req: Request, res: Response) => {
                 return
             }
             const token=jwt.sign({
-                userId:user.id
+                userId:user.id,
+                name:user.name
             }, JWT_secret)
 
             res.json({
-                token
+                token,
+                name:user.name
             })
         } catch (error) {
             console.log(error)

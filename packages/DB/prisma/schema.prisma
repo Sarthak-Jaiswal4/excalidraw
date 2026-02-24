@@ -13,9 +13,9 @@ model User {
   password    String
   name        String
   photo       String?
-  favorite    Room[]  @relation("FavoriteRooms")
   chats       Chat[]
   rooms       Room[]  @relation("AdminRooms")
+  favorite    Room[]  @relation("FavoriteRooms")
   memberRooms Room[]  @relation("MemberRooms")
 }
 
@@ -25,9 +25,9 @@ model Room {
   createdAt   DateTime @default(now())
   adminId     String
   photo       String?
-  favoritedBy User[]   @relation("FavoriteRooms")
   chats       Chat[]
   admin       User     @relation("AdminRooms", fields: [adminId], references: [id])
+  favoritedBy User[]   @relation("FavoriteRooms")
   members     User[]   @relation("MemberRooms")
 }
 

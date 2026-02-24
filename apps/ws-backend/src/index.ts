@@ -22,26 +22,34 @@ import { createClient } from 'redis';
 //   }
 // });
 
-  const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 8080 });
 
 interface usertype {
   userId: string,
   rooms: number[],
-  websocket: WebSocket
+  websocket: WebSocket,
+  name: string
+}
+
+interface JWTObject {
+  userId: string,
+  name: string,
+  iat: number
 }
 
 const users: usertype[] = []
 
-const subscribedchannel=new Set()
+const subscribedchannel = new Set()
 
-function checkuser(token: string): string | null {
+function checkuser(token: string): JWTObject | null {
   try {
     const decoded = jwt.verify(token, JWT_secret);
 
     if (!decoded || typeof decoded !== 'object' || !('userId' in decoded)) {
       return null;
     }
-    return (decoded as JwtPayload).userId as string;
+    console.log(decoded)
+    return (decoded as JWTObject);
   } catch (error) {
     console.log(error);
     return null;
@@ -55,7 +63,7 @@ function checkuser(token: string): string | null {
 // pub.connect();
 // sub.connect();
 
-wss.on('connection',async function connection(ws, request) {
+wss.on('connection', async function connection(ws, request) {
   ws.on('error', console.error);
 
   const url = request.url
@@ -64,32 +72,41 @@ wss.on('connection',async function connection(ws, request) {
   }
   const queryparams = new URLSearchParams(url.split('?')[1])
   const token = queryparams.get('token') || ""
-  const userId = checkuser(token)
+  const jwtObject = checkuser(token)
 
-  if (!userId && userId!=undefined && userId!=null) {
+  if (!jwtObject && jwtObject != undefined && jwtObject != null) {
     ws.close()
     return
   }
 
   users.push({
-    userId: userId as string,
+    userId: jwtObject?.userId as string,
     rooms: [],
-    websocket: ws
+    websocket: ws,
+    name: jwtObject?.name as string
   })
 
-  ws.on('message',async function message(data: any) {
+  ws.on('close', () => {
+    const index = users.findIndex(user => user.websocket === ws);
+    if (index !== -1) {
+      users.splice(index, 1);
+    }
+  });
+
+  ws.on('message', async function message(data: any) {
     const parsedData = JSON.parse(data)
     console.log(parsedData)
 
-    if(parsedData.type === "corsor_move"){
-      const posx=parsedData.posx;
-      const posy=parsedData.posy;
-      const finduser=users.find(user => user.websocket===ws)
-      if(finduser){
-        users.forEach((user)=>{
-          if(user.rooms.includes(parsedData.roomId)){
+    if (parsedData.type === "corsor_move") {
+      const posx = parsedData.posx;
+      const posy = parsedData.posy;
+      const finduser = users.find(user => user.websocket === ws)
+      if (finduser) {
+        users.forEach((user) => {
+          if (user.rooms.includes(parsedData.roomId) && user.websocket !== ws) {
             user.websocket.send(JSON.stringify({
-              posx,posy,type:"corsor_move"
+              posx, posy, type: "corsor_move",
+              name:jwtObject?.name
             }))
           }
         })
@@ -100,9 +117,10 @@ wss.on('connection',async function connection(ws, request) {
       const existuser = users.find(user => user.websocket === ws)
       if (!existuser) {
         users.push({
-          userId: userId as string,
+          userId: jwtObject?.userId as string,
           rooms: [parsedData.room],
-          websocket: ws
+          websocket: ws,
+          name:jwtObject?.name as string
         })
       } else {
         const upadteduser = existuser.rooms.push(parsedData.room)
@@ -112,7 +130,7 @@ wss.on('connection',async function connection(ws, request) {
       //   try {
       //     await sub.subscribe(`${parsedData.room}`, (message,channel) => {
       //       console.log(`Subscribed successfully to room: ${channel},${message}`);
-            
+
       //       users.forEach(user => {
       //         if (user.rooms.includes(Number(channel)) && ws!==user.websocket) {
       //           user.websocket.send(JSON.stringify(message))
@@ -136,21 +154,24 @@ wss.on('connection',async function connection(ws, request) {
     if (parsedData.type === "chat") {
       const room = parsedData.room
       const message = parsedData.message
-      
-      const chat=await prismaClient.chat.create({
-        data:{
-          roomId:room,
-          message:message,
-          userId: userId as string
+
+      const chat = await prismaClient.chat.create({
+        data: {
+          roomId: room,
+          message: message,
+          userId: jwtObject?.userId as string
         }
       })
-
+      const User = users.find(user => user.websocket === ws)
+      console.log(User?.userId)
+      console.log(users.length)
+      console.log("parsed data", message)
       users.forEach(user => {
         if (user.rooms.includes(room)) {
           user.websocket.send(JSON.stringify({
-            type:"chat",
+            type: "chat",
             message,
-            roomId:Number(room),
+            roomId: Number(room),
           }))
         }
       })
@@ -167,31 +188,31 @@ wss.on('connection',async function connection(ws, request) {
       // }
     }
 
-    if(parsedData.type === 'delete'){
+    if (parsedData.type === 'delete') {
       const room = parsedData.room
       const message = parsedData.message
 
       users.forEach(user => {
         if (user.rooms.includes(room)) {
           user.websocket.send(JSON.stringify({
-            type:"delete",
+            type: "delete",
             message,
-            roomId:room,
+            roomId: room,
           }))
         }
       })
     }
 
-    if(parsedData.type==='move'){
+    if (parsedData.type === 'move') {
       const room = parsedData.room
       const message = parsedData.message
 
       users.forEach(user => {
         if (user.rooms.includes(room)) {
           user.websocket.send(JSON.stringify({
-            type:"move",
+            type: "move",
             message,
-            roomId:room,
+            roomId: room,
           }))
         }
       })
