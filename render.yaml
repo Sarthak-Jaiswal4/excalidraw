@@ -5,6 +5,7 @@ services:
     name: http-server
     env: docker
     region: singapore
+    plan: free
     dockerContext: .
     dockerfilePath: ./docker/Dockerfile.backend
     envVars:
@@ -21,6 +22,7 @@ services:
     name: ws-backend
     env: docker
     region: singapore
+    plan: free
     dockerContext: .
     dockerfilePath: ./docker/Dockerfile.websocket
     envVars:
