@@ -5,13 +5,13 @@ import { updatemember } from '@/actions'
 
 function SocketLayer({ roomId, token }: { roomId: string, token: string }) {
   const [socket, setsocket] = useState<WebSocket | null>(null)
-  const IP = process.env.PROD_HOST
+  const IP = process.env.WS_URL
   console.log(IP)
 
   useEffect(() => {
     let ws: WebSocket;
     try {
-          ws=IP ? new WebSocket(`${process.env.WS_URL}?token=${token}`) : new WebSocket(`ws://localhost:8080?token=${token}`)
+          ws=new WebSocket(`https://excaliadrw-ws-backend.onrender.com/token=${token}`)
       console.log(ws)
       ws.onopen = () => {
         setsocket(ws)

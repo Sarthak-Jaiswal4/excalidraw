@@ -25,7 +25,7 @@ const httpServer = createServer();
 //   }
 // });
 
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 3003 });
 
 interface usertype {
   userId: string,

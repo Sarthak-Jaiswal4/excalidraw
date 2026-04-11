@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 const url=  process.env.PROD_HOST
 
 const instance = axios.create({
-    baseURL: url ? "http://backend:3001/" : "http://localhost:3001/"
+    baseURL: url ? "https://excaliadrw-http-server.onrender.com/" : "http://localhost:3001/"
 });
 console.log(instance.getUri())
 export const login = async (data: any) => {
@@ -44,21 +44,31 @@ export const signup = async (data: any) => {
 }
 
 export const getRooms = async () => {
-    const getcookie = (await cookies()).get("token");
-    const getroom = await instance.get('/getallroom', {
-        headers: {
-            Authorization: `${getcookie?.value}`
-        }
-    });
+    try {
+        const getcookie = (await cookies()).get("token");
+        const getroom = await instance.get('/getallroom', {
+            headers: {
+                Authorization: `${getcookie?.value}`
+            }
+        });
 
-    const mycreatedroom = [...getroom.data.rooms.rooms];
-    const memberRooms = getroom.data.rooms.memberRooms;
-    const myallrooms = getroom.data.allrooms;
-    const favrooms = getroom?.data?.rooms.favorite;
-    if (getroom.status === 200) {
-        return { status: true, mycreatedrooms: mycreatedroom, memberroom: memberRooms, myallrooms: myallrooms, userId: getroom.data.userId, favrooms };
-    } else {
-        return { status: false, rooms: [] };
+        const allrooms = getroom.data.allrooms || [];
+        const userId = getroom.data.userId;
+
+        const mycreatedroom = allrooms.filter((r: any) => r.adminId === userId);
+        const memberRooms = allrooms.filter((r: any) => r.adminId !== userId && r.members && r.members.length > 0);
+        const favrooms = allrooms.filter((r: any) => r.favoritedBy && r.favoritedBy.length > 0);
+
+        return { 
+            status: true, 
+            mycreatedrooms: mycreatedroom, 
+            memberroom: memberRooms, 
+            myallrooms: allrooms, 
+            userId: userId, 
+            favrooms 
+        };
+    } catch (error) {
+        return { status: false, rooms: [], mycreatedrooms: [], memberroom: [], myallrooms: [], favrooms: [] };
     }
 }
 
