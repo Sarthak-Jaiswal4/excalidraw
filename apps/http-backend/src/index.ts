@@ -34,12 +34,13 @@ app.post('/createroom', middleware, async (req: express.Request, res: express.Re
                 slug: data.data?.name,
                 adminId: String(userId),
                 members: {
-                    connect: [{ id: String(userId) }]
+                    create: { userId: String(userId) }
                 },
             }
         })
         res.status(200).json(room)
     } catch (error) {
+        console.error("Prisma error in /createroom:", error);
         res.status(411).json({
             message: "room already exists!"
         })
@@ -90,30 +91,34 @@ app.get('/getallroom', middleware, async (req: Request, res: Response) => {
             res.status(401).json({ message: 'unauthorized' })
             return
         }
-        const rooms = await prismaClient.user.findUnique({
-            where: { id: String(userId) },
-            include: {
-                rooms: true,
-                memberRooms: true,
-                favorite:true,
-            }
-        })
-
         const allrooms = await prismaClient.room.findMany({
             where: {
                 OR: [
                     { adminId: String(userId) },
                     {
                         members: {
-                            some: {
-                                id: String(userId)
-                            }
+                            some: { userId: String(userId) } 
                         }
                     }
                 ]
+            },
+            select: {
+                id: true,
+                slug: true,
+                createdAt: true,
+                adminId: true,
+                // photo: true  👈 exclude this until you migrate
+                members: {
+                    where: { userId: String(userId) },
+                    select: { userId: true }
+                },
+                favoritedBy: {
+                    where: { userId: String(userId) },
+                    select: { userId: true }
+                }
             }
         })
-        res.json({ rooms, userId, allrooms })
+        res.json({ userId, allrooms })
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: 'internal error' })
@@ -140,22 +145,23 @@ app.post('/update/members', middleware, async (req: Request, res: Response) => {
                 id: Number(roomid),
                 members: {
                     some: {
-                        id: String(userid)
+                        userId: String(userid)
                     }
                 }
             }
         });
 
         if(isalready){
-            res.status(200).json({ message: "member already added" })
+            res.status(200).json({ message: "member already added" });
+            return;
         }
 
         const updatemembers = await prismaClient.room.update({
             where: { id: Number(roomid) },
             data: {
                 members: {
-                    connect: {
-                        id: String(userid)
+                    create: {
+                        userId: String(userid)
                     }
                 }
             }
@@ -198,16 +204,19 @@ app.post("/update/favorite", middleware, async (req: Request, res: Response) => 
         if (action) {
             updateData = {
                 favorite: {
-                    connect: {
-                        id: Number(roomid)
+                    create: {
+                        roomId: Number(roomid)
                     }
                 }
             };
         } else {
             updateData = {
                 favorite: {
-                    disconnect: {
-                        id: Number(roomid)
+                    delete: {
+                        userId_roomId: {
+                            userId: String(userID),
+                            roomId: Number(roomid)
+                        }
                     }
                 }
             };
@@ -253,6 +262,11 @@ app.post("/delete/room", middleware, async (req: Request, res: Response) => {
     }
 });
 
-app.listen(3001, () => {
-    console.log("Running on port 3001")
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+app.listen(PORT, () => {
+    console.log(`http-server running at ${PORT} port`);
+    // Keep alive every 5 minutes
+    setInterval(() => {
+        fetch(process.env.PUBLIC_URL || `http://localhost:${PORT}/`).catch(() => {});
+    }, 5 * 60 * 1000);
 })

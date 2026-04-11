@@ -3,6 +3,9 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 import { JWT_secret } from './config';
 import { prismaClient } from '@repo/DB/DB';
 import { createClient } from 'redis';
+import {createServer}  from 'http'
+
+const httpServer = createServer();
 
 // const pub = createClient({
 //     username: 'default',
@@ -219,3 +222,12 @@ wss.on('connection', async function connection(ws, request) {
     }
   });
 })
+
+const PORT = process.env.PORT || 3003; 
+httpServer.listen(PORT, () => {
+  console.log(`WebSocket Server running on port ${PORT}`);
+  // Keep alive every 5 minutes
+  setInterval(() => {
+      fetch(process.env.PUBLIC_URL || `http://localhost:${PORT}`).catch(() => {});
+  }, 5 * 60 * 1000);
+});

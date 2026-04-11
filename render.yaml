@@ -1,0 +1,34 @@
+version: "1"
+
+services:
+  - type: web
+    name: http-server
+    env: docker
+    region: singapore
+    dockerContext: .
+    dockerfilePath: ./docker/Dockerfile.backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: PUBLIC_URL
+        value: https://http-server-6i9s.onrender.com
+      - key: PORT
+        value: 3001
+
+  - type: web
+    name: ws-backend
+    env: docker
+    region: singapore
+    dockerContext: .
+    dockerfilePath: ./docker/Dockerfile.websocket
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: PUBLIC_URL
+        value: https://http-server-6i9s.onrender.com
+      - key: PORT
+        value: 8080
