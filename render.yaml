@@ -14,7 +14,7 @@ services:
       - key: DIRECT_URL
         sync: false
       - key: PUBLIC_URL
-        value: https://http-server-6i9s.onrender.com
+        value: https://excaliadrw-http-server.onrender.com
       - key: PORT
         value: 3001
 
@@ -31,6 +31,6 @@ services:
       - key: DIRECT_URL
         sync: false
       - key: PUBLIC_URL
-        value: https://http-server-6i9s.onrender.com
+        value: https://excaliadrw-ws-backend.onrender.com
       - key: PORT
         value: 8080
