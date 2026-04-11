@@ -30,6 +30,8 @@ COPY --from=build /app/package.json ./
 COPY --from=build /app/pnpm-lock.yaml ./
 COPY --from=build /app/pnpm-workspace.yaml ./
 COPY --from=build /app/packages/DB ./packages/DB
+COPY --from=build /app/packages/typescript-config ./packages/typescript-config
+COPY --from=build /app/packages/eslint-config ./packages/eslint-config
 COPY --from=build /app/apps/http-backend/package.json ./apps/http-backend/
 COPY --from=build /app/apps/http-backend/dist ./apps/http-backend/dist
 
