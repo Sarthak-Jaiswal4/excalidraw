@@ -2,12 +2,14 @@
   "name": "@repo/DB",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./DB": "./src/index.ts"
+    "./DB": "./dist/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
@@ -21,6 +23,7 @@
     "@prisma/client": "6.16.1",
     "dotenv": "^17.4.1",
     "pg": "^8.20.0",
-    "prisma": "^6.16.1"
+    "prisma": "^6.16.1",
+    "typescript": "^6.0.2"
   }
 }

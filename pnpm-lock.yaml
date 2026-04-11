@@ -224,7 +224,7 @@ importers:
         version: 7.7.0
       '@prisma/client':
         specifier: 6.16.1
-        version: 6.16.1(prisma@6.16.1(typescript@5.9.2))(typescript@5.9.2)
+        version: 6.16.1(prisma@6.16.1(typescript@6.0.2))(typescript@6.0.2)
       dotenv:
         specifier: ^17.4.1
         version: 17.4.1
@@ -233,7 +233,10 @@ importers:
         version: 8.20.0
       prisma:
         specifier: ^6.16.1
-        version: 6.16.1(typescript@5.9.2)
+        version: 6.16.1(typescript@6.0.2)
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
     devDependencies:
       '@repo/typescript-config':
         specifier: workspace:*
@@ -3821,10 +3824,10 @@ snapshots:
     transitivePeerDependencies:
       - pg-native
 
-  '@prisma/client@6.16.1(prisma@6.16.1(typescript@5.9.2))(typescript@5.9.2)':
+  '@prisma/client@6.16.1(prisma@6.16.1(typescript@6.0.2))(typescript@6.0.2)':
     optionalDependencies:
-      prisma: 6.16.1(typescript@5.9.2)
-      typescript: 5.9.2
+      prisma: 6.16.1(typescript@6.0.2)
+      typescript: 6.0.2
 
   '@prisma/config@6.16.1':
     dependencies:
@@ -6060,12 +6063,12 @@ snapshots:
 
   prettier@3.6.2: {}
 
-  prisma@6.16.1(typescript@5.9.2):
+  prisma@6.16.1(typescript@6.0.2):
     dependencies:
       '@prisma/config': 6.16.1
       '@prisma/engines': 6.16.1
     optionalDependencies:
-      typescript: 5.9.2
+      typescript: 6.0.2
     transitivePeerDependencies:
       - magicast
 
