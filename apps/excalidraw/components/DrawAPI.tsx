@@ -152,10 +152,12 @@ export default async function DrawApi(canvas: HTMLCanvasElement, socket: WebSock
                         dragStartShapeX = selectedShape.centerx
                         dragStartShapeY = selectedShape.centery
                     }
-                    if (selectedShape || dragging) {
+                    if (selectedShape) {
                         const selection = dashSelection(drawing, selectedShape, ctx, selectedShapeBorderId);
-                        selectedShapeBorderId = selection.id;
-                        fakeSelectedShape = selection.shape;
+                        if (selection) {
+                            selectedShapeBorderId = selection.id;
+                            fakeSelectedShape = selection.shape;
+                        }
                     }
                 }
                 DragShot = selectedShape ? JSON.parse(JSON.stringify(selectedShape)) : null

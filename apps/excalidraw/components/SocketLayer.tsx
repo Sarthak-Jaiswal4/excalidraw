@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Canvas from './Canvas'
 import { updatemember } from '@/actions'
 
-function SocketLayer({ roomId }: { roomId: string }) {
+function SocketLayer({ roomId, token }: { roomId: string, token: string }) {
   const [socket, setsocket] = useState<WebSocket | null>(null)
   const IP = process.env.PROD_HOST
   console.log(IP)
@@ -11,7 +11,7 @@ function SocketLayer({ roomId }: { roomId: string }) {
   useEffect(() => {
     let ws: WebSocket;
     try {
-          ws=IP ? new WebSocket("ws://15.207.20.241:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjZjEyYjFlMC03OWMwLTQ0ZmUtYjllMC1iZWQ4NjgzNGI2YmMiLCJuYW1lIjoic2FydGhhayIsImlhdCI6MTc3MTk0MTgxNX0.PhQAvu25QNjDy9QBjBmO4hBwhbkU31gxHWsnrJeNq5Y") : new WebSocket("ws://localhost:8080?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjZjEyYjFlMC03OWMwLTQ0ZmUtYjllMC1iZWQ4NjgzNGI2YmMiLCJuYW1lIjoic2FydGhhayIsImlhdCI6MTc3MTk0MTgxNX0.PhQAvu25QNjDy9QBjBmO4hBwhbkU31gxHWsnrJeNq5Y")
+          ws=IP ? new WebSocket(`${process.env.WS_URL}?token=${token}`) : new WebSocket(`ws://localhost:8080?token=${token}`)
       console.log(ws)
       ws.onopen = () => {
         setsocket(ws)
