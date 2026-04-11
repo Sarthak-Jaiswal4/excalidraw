@@ -2,7 +2,7 @@ version: "1"
 
 services:
   - type: web
-    name: http-server
+    name: excaliadrw-http-server
     env: docker
     region: singapore
     plan: free
@@ -19,7 +19,7 @@ services:
         value: 3001
 
   - type: web
-    name: ws-backend
+    name: excaliadrw-ws-backend
     env: docker
     region: singapore
     plan: free
