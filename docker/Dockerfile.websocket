@@ -36,4 +36,4 @@ COPY --from=build /app/apps/ws-backend/dist ./apps/ws-backend/dist
 RUN pnpm install --frozen-lockfile
 EXPOSE 8080
 
-CMD ["sh", "-c","pnpm --filter @repo/DB exec prisma migrate deploy --schema=./prisma/schema.prisma && node apps/ws-backend/dist/index.js"]
+CMD ["sh", "-c","pnpm --filter @repo/DB exec prisma migrate deploy --schema=./prisma/schema.prisma && && pnpm run start"]
