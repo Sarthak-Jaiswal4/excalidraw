@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma",
+    "migrate": "prisma migrate deploy --schema=./prisma/schema.prisma"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
