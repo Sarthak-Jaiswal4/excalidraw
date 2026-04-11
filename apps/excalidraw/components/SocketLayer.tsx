@@ -11,7 +11,7 @@ function SocketLayer({ roomId, token }: { roomId: string, token: string }) {
   useEffect(() => {
     let ws: WebSocket;
     try {
-          ws=new WebSocket(`https://excaliadrw-ws-backend.onrender.com/token=${token}`)
+          ws=new WebSocket(`wss://excaliadrw-ws-backend.onrender.com?token=${token}`)
       console.log(ws)
       ws.onopen = () => {
         setsocket(ws)
