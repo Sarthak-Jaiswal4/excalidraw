@@ -114,7 +114,7 @@ function LoginPage() {
           <DropdownMenuItem>
             <div className='flex items-center justify-between gap-2 w-full'>
               <h1>Password</h1>
-              <h4>12345</h4>
+              <h4>sarthak</h4>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
